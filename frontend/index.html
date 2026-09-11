@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Resume Analyzer</title>
+  <link rel="icon" href="data:image/svg+xml, svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+  <link rel="stylesheet" href="/styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="/static/app.js" defer></script>
+</head>
+<body>
+  <div class="app-container">
+    <header class="header">
+      <div class="brand">
+        <span class="badge">ENGINEERING AUDIT</span>
+        <h1>Bar-Raiser // System Causality Engine</h1>
+        <p class="subtitle">Anti-ATS resume inspection. We audit Google XYZ causality, penalize unbacked buzzwords, and generate interview interrogation matrices.</p>
+      </div>
+      <div class="stats-badge">Audits Run: <span id="audit-count">--</span></div>
+    </header>
+
+    <main class="workspace">
+      <!-- Input Panel -->
+      <section class="card input-card">
+        <div class="section-title">01 / TARGET BENCHMARK</div>
+        <label class="field-label">Select Target Role Archetype (Zero JD Friction)</label>
+        <div class="preset-group" id="preset-group">
+          <button type="button" class="preset-btn active" data-preset="backend_python">Backend (Python / Async)</button>
+          <button type="button" class="preset-btn" data-preset="backend_general">Platform (Microservices / Go)</button>
+          <button type="button" class="preset-btn" data-preset="distributed_systems">Distributed Systems / Infra</button>
+          <button type="button" class="preset-btn" data-preset="fullstack_product">Full-Stack Platform</button>
+        </div>
+
+        <details class="jd-accordion">
+          <summary>Or paste custom Job Description (Optional)</summary>
+          <textarea id="jd-input" rows="4" placeholder="Paste custom JD requirements here to override preset defaults..."></textarea>
+        </details>
+
+        <div class="section-title" style="margin-top: 1.5rem;">02 / CANDIDATE DOSSIER</div>
+        
+        <div class="drop-zone" id="drop-zone">
+          <input type="file" id="file-input" accept=".pdf" style="display: none;" />
+          <p id="file-label">Click anywhere here or <span class="browse-link">browse</span> to upload Resume PDF</p>
+          <span class="file-spec">Strict PDF format only (Max 10MB)</span>
+        </div>
+
+        <button id="analyze-btn" class="primary-btn">
+          Execute Bar-Raiser Audit
+        </button>
+      </section>
+
+      <!-- Output Dashboard -->
+      <section class="results-container hidden" id="results-container">
+        <div class="card summary-card">
+          <div class="summary-header">
+            <div>
+              <span class="metric-label">Assessed Level</span>
+              <h2 id="assessed-level">--</h2>
+            </div>
+            <div class="score-box">
+              <span class="metric-label">Defensibility Index</span>
+              <div class="score-value"><span id="match-score">0</span>%</div>
+            </div>
+          </div>
+          <p id="fit-summary" class="summary-text"></p>
+          
+          <div id="buzzword-radar" class="buzzword-box hidden">
+            <span class="alert-tag">UNBACKED BUZZWORDS DETECTED</span>
+            <p class="buzzword-desc">Technologies listed under your Skills with zero architectural proof in experience:</p>
+            <div id="buzzwords-list" class="tag-list"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="section-title">TECHNICAL PROOF-OF-WORK MATRIX</div>
+          <div class="table-responsive">
+            <table class="matrix-table">
+              <thead>
+                <tr>
+                  <th>Competency</th>
+                  <th>Category</th>
+                  <th>Verification</th>
+                  <th>Causality Proof</th>
+                </tr>
+              </thead>
+              <tbody id="skill-matrix-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="section-title">BULLET-LEVEL CAUSALITY INSPECTION (GOOGLE XYZ)</div>
+          <div id="bullet-audits-list" class="bullet-list"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
