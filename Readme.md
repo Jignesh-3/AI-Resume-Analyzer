@@ -118,7 +118,7 @@ Code snippet
 GEMINI_API_KEY="your-gemini-api-key-here"
 3. Start the Server
 Bash
-uvicorn main:app --reload
+uvicorn backend.main:app --reload
 Navigate to http://127.0.0.1:8000 to access the dashboard.
 
 🛡️ Design Decisions & Trade-Offs
