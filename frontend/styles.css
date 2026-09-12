@@ -9,6 +9,9 @@
   --danger: #ef4444;
   --danger-dim: rgba(239, 68, 68, 0.15);
   --warning: #f59e0b;
+  --warning-dim: rgba(245, 158, 11, 0.15);
+  --blue: #3b82f6;
+  --blue-dim: rgba(59, 130, 246, 0.15);
   --text: #f3f4f6;
   --text-muted: #94a3b8;
   --font-mono: 'JetBrains Mono', 'Consolas', monospace;
@@ -39,19 +42,13 @@ body {
 }
 
 @keyframes ambientMeshFlow {
-  0% {
-    background-position: 0% 0%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 50% 100%;
-  }
+  0% { background-position: 0% 0%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 50% 100%; }
 }
 
 .app-container {
-  max-width: 1020px;
+  max-width: 1080px;
   margin: 0 auto;
 }
 
@@ -83,8 +80,6 @@ body {
   margin: 0.6rem 0 0.4rem;
   font-weight: 700;
   letter-spacing: -0.5px;
-
-  /* Multi-stop color wave: Emerald -> Cyan -> Violet -> Emerald */
   background: linear-gradient(
     90deg,
     #10b981 0%,
@@ -94,29 +89,21 @@ body {
     #10b981 100%
   );
   background-size: 200% auto;
-  
-  /* Mask the gradient strictly inside the text */
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-
-  /* Infinite wave animation */
   animation: liquidWave 4s linear infinite;
 }
 
 @keyframes liquidWave {
-  0% {
-    background-position: 0% center;
-  }
-  100% {
-    background-position: 200% center;
-  }
+  0% { background-position: 0% center; }
+  100% { background-position: 200% center; }
 }
 
 .subtitle {
   color: var(--text-muted);
   font-size: 0.9rem;
-  max-width: 650px;
+  max-width: 680px;
 }
 
 .stats-badge {
@@ -129,15 +116,16 @@ body {
   box-shadow: var(--glass-shadow);
   padding: 0.5rem 1rem;
   border-radius: 8px;
+  white-space: nowrap;
 }
 
-/* Glass Cards */
+/* Base Glass Cards */
 .card {
   background: var(--surface);
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
   border: 1px solid var(--surface-border);
-  border-top: 1px solid rgba(255, 255, 255, 0.15); /* light bounce edge */
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
   box-shadow: var(--glass-shadow);
   border-radius: 14px;
   padding: 1.75rem;
@@ -154,6 +142,18 @@ body {
   font-weight: 600;
 }
 
+.section-heading {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.section-subheading {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 0.2rem;
+}
+
 .field-label {
   display: block;
   font-size: 0.85rem;
@@ -162,7 +162,7 @@ body {
   color: #e2e8f0;
 }
 
-/* Preset Buttons */
+/* Preset Archetype Buttons */
 .preset-group {
   display: flex;
   flex-wrap: wrap;
@@ -285,53 +285,145 @@ body {
   transform: none;
 }
 
-/* Output Dashboard Summary */
-.summary-header {
+/* -------------------------------------------------------------
+   CLIP 2: 4-KPI TOP METRICS STRIP
+------------------------------------------------------------- */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.kpi-card {
+  background: var(--surface);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--surface-border);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 1.2rem;
+  box-shadow: var(--glass-shadow);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.kpi-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-}
-
-.metric-label {
   font-family: var(--font-mono);
   font-size: 0.75rem;
   color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.6rem;
 }
 
-.score-box {
-  text-align: right;
+.kpi-badge {
+  font-size: 0.65rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  border: 1px solid transparent;
 }
 
-.score-value {
-  font-family: var(--font-mono);
-  font-size: 2.5rem;
-  font-weight: 800;
+.badge-neutral {
+  background: rgba(255, 255, 255, 0.08);
+  color: #e2e8f0;
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.badge-blue {
+  background: var(--blue-dim);
+  color: #60a5fa;
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+.badge-green {
+  background: var(--accent-dim);
   color: var(--accent);
-  text-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+  border-color: rgba(16, 185, 129, 0.3);
 }
 
-.summary-text {
-  margin-top: 1.25rem;
-  font-size: 0.95rem;
-  line-height: 1.65;
-  color: #cbd5e1;
+.badge-red {
+  background: var(--danger-dim);
+  color: #fca5a5;
+  border-color: rgba(239, 68, 68, 0.3);
 }
 
-/* Buzzword Radar */
+.kpi-value {
+  font-family: var(--font-mono);
+  font-size: 2.1rem;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.1;
+  margin-bottom: 0.4rem;
+}
+
+.value-warn {
+  color: var(--danger);
+}
+
+.kpi-subtext {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  line-height: 1.35;
+}
+
+/* Card Header Bar */
+.card-header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.bar-raiser-tag {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  background: rgba(99, 102, 241, 0.15);
+  color: #a5b4fc;
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  font-weight: 600;
+}
+
+.bar-raiser-tag.tag-blue {
+  background: var(--blue-dim);
+  color: #93c5fd;
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+/* Buzzword Radar Banner */
 .buzzword-box {
-  margin-top: 1.5rem;
   background: rgba(239, 68, 68, 0.08);
-  border: 1px solid rgba(239, 68, 68, 0.3);
-  padding: 1.1rem;
-  border-radius: 10px;
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  padding: 1.25rem;
+  border-radius: 12px;
   backdrop-filter: blur(8px);
+  margin-bottom: 1.5rem;
+}
+
+.buzzword-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.35rem;
 }
 
 .alert-tag {
   font-family: var(--font-mono);
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   color: var(--danger);
   font-weight: 700;
   letter-spacing: 0.5px;
@@ -339,8 +431,8 @@ body {
 
 .buzzword-desc {
   font-size: 0.85rem;
-  margin: 0.3rem 0 0.7rem;
-  color: var(--text);
+  margin-bottom: 0.85rem;
+  color: #cbd5e1;
 }
 
 .tag-list {
@@ -350,28 +442,89 @@ body {
 }
 
 .danger-tag {
-  background: rgba(239, 68, 68, 0.2);
-  border: 1px solid rgba(239, 68, 68, 0.5);
+  background: rgba(239, 68, 68, 0.18);
+  border: 1px solid rgba(239, 68, 68, 0.45);
   color: #fca5a5;
   font-family: var(--font-mono);
   font-size: 0.75rem;
-  padding: 0.25rem 0.6rem;
+  padding: 0.3rem 0.65rem;
   border-radius: 6px;
 }
+
+/* Executive Technical Assessment */
+.summary-text {
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: #cbd5e1;
+}
+
+/* -------------------------------------------------------------
+   CLIP 2: FILTERABLE MATRIX & TABS
+------------------------------------------------------------- */
+.matrix-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.matrix-tabs {
+  display: flex;
+  background: rgba(10, 15, 25, 0.75);
+  padding: 0.25rem;
+  border-radius: 8px;
+  border: 1px solid var(--surface-border);
+  gap: 0.25rem;
+}
+
+.tab-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: all 0.2s ease;
+}
+
+.tab-btn:hover {
+  color: #fff;
+}
+
+.tab-btn.active {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.tab-count {
+  font-size: 0.7rem;
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.count-verified { color: var(--accent); }
+.count-surface  { color: var(--warning); }
+.count-missing  { color: var(--danger); }
 
 /* Matrix Table */
 .table-responsive {
   width: 100%;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  margin-top: 0.5rem;
 }
 
 .matrix-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.85rem;
-  min-width: 520px;
+  min-width: 600px;
 }
 
 .matrix-table th, .matrix-table td {
@@ -382,10 +535,45 @@ body {
 
 .matrix-table th {
   font-family: var(--font-mono);
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.8px;
+}
+
+.matrix-table tr:hover td {
+  background: rgba(255, 255, 255, 0.015);
+}
+
+.tech-name {
+  font-weight: 600;
+  color: #fff;
+}
+
+.domain-name {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.importance-pill {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.importance-CRITICAL {
+  background: rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.importance-PREFERRED {
+  background: rgba(59, 130, 246, 0.15);
+  color: #93c5fd;
+  border: 1px solid rgba(59, 130, 246, 0.3);
 }
 
 .status-pill {
@@ -393,7 +581,7 @@ body {
   font-size: 0.7rem;
   padding: 0.25rem 0.55rem;
   border-radius: 6px;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .status-VERIFIED {
@@ -414,45 +602,101 @@ body {
   border: 1px solid rgba(239, 68, 68, 0.3);
 }
 
-/* Bullet Items & Diff Boxes */
+/* -------------------------------------------------------------
+   CLIP 2: BULLET REFACTOR ITEMS & DIAGNOSTIC BADGES
+------------------------------------------------------------- */
 .bullet-item {
-  background: rgba(10, 15, 25, 0.5);
+  background: rgba(10, 15, 25, 0.55);
   border: 1px solid var(--surface-border);
-  border-radius: 10px;
+  border-radius: 12px;
   padding: 1.35rem;
   margin-bottom: 1.25rem;
+}
+
+.refactor-meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.diagnostic-group {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.diagnostic-tag {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: #fca5a5;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  padding: 0.2rem 0.55rem;
+  border-radius: 5px;
+  font-weight: 600;
+}
+
+.coherence-tag {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.coherence-tag strong {
+  color: #fff;
+}
+
+.project-context-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #e2e8f0;
+  margin-bottom: 0.6rem;
 }
 
 .diff-box {
   background: rgba(3, 7, 18, 0.85);
   border-radius: 8px;
-  padding: 0.85rem;
+  padding: 0.9rem 1rem;
   font-family: var(--font-mono);
-  font-size: 0.85rem;
-  margin: 0.85rem 0;
+  font-size: 0.82rem;
+  margin: 0.75rem 0;
   border: 1px solid rgba(255, 255, 255, 0.05);
+  line-height: 1.6;
 }
 
 .diff-red {
   color: #f87171;
+  display: flex;
+  gap: 0.6rem;
   margin-bottom: 0.5rem;
 }
 
 .diff-green {
   color: #34d399;
+  display: flex;
+  gap: 0.6rem;
+}
+
+.diff-sign {
+  font-weight: 700;
+  user-select: none;
 }
 
 .critique {
   font-size: 0.85rem;
   color: var(--text-muted);
-  margin-bottom: 0.75rem;
   line-height: 1.5;
+  margin-top: 0.6rem;
+}
+
+.critique strong {
+  color: #e2e8f0;
 }
 
 .copy-toolbar {
   display: flex;
   gap: 0.5rem;
-  margin: 0.5rem 0 1rem;
 }
 
 .copy-pill {
@@ -460,8 +704,8 @@ body {
   border: 1px solid var(--surface-border);
   color: var(--text);
   font-family: var(--font-mono);
-  font-size: 0.75rem;
-  padding: 0.35rem 0.7rem;
+  font-size: 0.72rem;
+  padding: 0.35rem 0.65rem;
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.15s ease;
@@ -472,34 +716,17 @@ body {
   color: var(--accent);
   background: var(--accent-dim);
 }
+.hidden { display: none !; }
 
-.trap-card {
-  background: rgba(245, 158, 11, 0.06);
-  border-left: 3px solid var(--warning);
-  padding: 0.85rem;
-  border-radius: 0 8px 8px 0;
-  margin-top: 0.85rem;
-  font-size: 0.85rem;
+/* -------------------------------------------------------------
+   RESPONSIVE DESIGN (MOBILE & TABLET)
+------------------------------------------------------------- */
+@media (max-width: 860px) {
+  .kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
-.trap-title {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  color: var(--warning);
-  font-weight: 700;
-  margin-bottom: 0.35rem;
-  letter-spacing: 0.5px;
-}
-
-.winning-formula {
-  margin-top: 0.6rem;
-  color: #cbd5e1;
-  font-size: 0.8rem;
-}
-
-.hidden { display: none !important; }
-
-/* Responsive adjustments */
 @media (max-width: 640px) {
   body {
     padding: 1rem 0.75rem;
@@ -522,19 +749,199 @@ body {
     width: 100%;
     text-align: center;
   }
-  .summary-header {
+  .kpi-grid {
+    grid-template-columns: 1fr;
+  }
+  .matrix-header-row {
     flex-direction: column;
     align-items: flex-start;
-    gap: 0.75rem;
   }
-  .score-box {
-    text-align: left;
+  .matrix-tabs {
+    width: 100%;
+    overflow-x: auto;
+  }
+  .refactor-meta-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.6rem;
   }
   .copy-toolbar {
-    flex-wrap: wrap;
+    width: 100%;
   }
   .copy-pill {
     flex: 1;
     text-align: center;
   }
+}
+
+/* =============================================================
+   CLIP 2 STRICT OVERRIDES & LAYOUT FIXES
+   ============================================================= */
+
+/* 1. Fix Issue 3: 4-Card KPI Strip */
+.kpi-grid {
+  display: grid ;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem ;
+  margin-bottom: 1.75rem ;
+}
+
+.kpi-card {
+  background: rgba(17, 24, 39, 0.65) !;
+  backdrop-filter: blur(14px) !;
+  -webkit-backdrop-filter: blur(14px) !;
+  border: 1px solid rgba(255, 255, 255, 0.08) !;
+  border-top: 1px solid rgba(255, 255, 255, 0.18) !;
+  border-radius: 12px !;
+  padding: 1.25rem !;
+  display: flex !;
+  flex-direction: column !;
+  justify-content: space-between !;
+}
+
+.kpi-header {
+  display: flex !;
+  justify-content: space-between !;
+  align-items: center !;
+  font-family: var(--font-mono) !;
+  font-size: 0.75rem !;
+  color: #94a3b8 !;
+  text-transform: uppercase !;
+  letter-spacing: 0.5px !;
+  margin-bottom: 0.5rem !;
+}
+
+.kpi-badge {
+  font-size: 0.65rem !;
+  padding: 0.2rem 0.5rem !;
+  border-radius: 4px !;
+  font-weight: 600 !;
+  text-transform: none !;
+}
+
+.kpi-value {
+  font-family: var(--font-mono) !;
+  font-size: 2.25rem !;
+  font-weight: 800 !;
+  color: #ffffff !;
+  line-height: 1.1 !;
+  margin: 0.35rem 0 !;
+}
+
+.kpi-subtext {
+  font-size: 0.72rem !;
+  color: #94a3b8 !;
+  line-height: 1.4 !;
+}
+
+
+/* 2. Fix Issue 2: Matrix Header & Tab Buttons */
+.matrix-header-row {
+  display: flex !;
+  justify-content: space-between !;
+  align-items: flex-end !;
+  margin-bottom: 1.25rem !;
+  gap: 1rem !;
+}
+
+.matrix-tabs {
+  display: flex !;
+  background: rgba(10, 15, 25, 0.85) !;
+  border: 1px solid rgba(255, 255, 255, 0.1) !;
+  padding: 0.25rem !;
+  border-radius: 8px !;
+  gap: 0.3rem !;
+}
+
+.tab-btn {
+  background: transparent !;
+  border: none !;
+  color: #94a3b8 !;
+  font-family: var(--font-mono) !;
+  font-size: 0.75rem !;
+  padding: 0.35rem 0.75rem !;
+  border-radius: 6px !;
+  cursor: pointer !;
+  display: flex !;
+  align-items: center !;
+  gap: 0.4rem !;
+  transition: all 0.2s ease !;
+}
+
+.tab-btn:hover {
+  color: #fff !;
+}
+
+.tab-btn.active {
+  background: rgba(255, 255, 255, 0.12) !;
+  color: #ffffff !;
+}
+
+.tab-count {
+  font-size: 0.7rem !;
+  padding: 0.1rem 0.35rem !;
+  border-radius: 4px !;
+  background: rgba(255, 255, 255, 0.08) !;
+}
+
+
+/* 3. Fix Issue 1: Interrogation Deck Cards */
+.card-header-bar {
+  display: flex !;
+  justify-content: space-between !;
+  align-items: center !;
+  margin-bottom: 1.25rem !;
+}
+
+.header-left {
+  display: flex !;
+  align-items: center !;
+  gap: 0.75rem !;
+}
+
+.interrogation-list {
+  display: flex !;
+  flex-direction: column !;
+  gap: 0.75rem !;
+  margin-top: 0.75rem !;
+}
+
+.interrogation-item {
+  display: flex !;
+  align-items: flex-start !;
+  gap: 0.85rem !;
+  background: rgba(10, 15, 25, 0.6) !;
+  border: 1px solid rgba(255, 255, 255, 0.08) !;
+  border-radius: 8px !;
+  padding: 0.9rem 1.1rem !;
+}
+
+.q-badge {
+  font-family: var(--font-mono) !;
+  font-size: 0.75rem !;
+  color: #f59e0b !;
+  background: rgba(245, 158, 11, 0.15) !;
+  border: 1px solid rgba(245, 158, 11, 0.3) ;
+  padding: 0.2rem 0.5rem ;
+  border-radius: 5px ;
+  font-weight: 700 ;
+  flex-shrink: 0 ;
+  margin-top: 0.1rem ;
+}
+
+.q-text {
+  font-size: 0.88rem ;
+  color: #e2e8f0 ;
+  line-height: 1.55 ;
+}
+
+.drill-tag {
+  font-family: var(--font-mono) ;
+  font-size: 0.75rem ;
+  color: #f59e0b ;
+  background: rgba(245, 158, 11, 0.12) ;
+  border: 1px solid rgba(245, 158, 11, 0.3) ;
+  padding: 0.25rem 0.65rem ;
+  border-radius: 6px ;
+  font-weight: 700 ;
 }

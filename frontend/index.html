@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AI Resume Analyzer</title>
-  <link rel="icon" href="data:image/svg+xml, svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
-  <link rel="stylesheet" href="/styles.css" />
+  <title>AI Resume Analyzer // Bar-Raiser Engine</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+  <link rel="stylesheet" href="/styles.css?v=3.2" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <script src="/static/app.js" defer></script>
+  <script src="/app.js" defer></script>
 </head>
 <body>
   <div class="app-container">
@@ -17,7 +17,7 @@
       <div class="brand">
         <span class="badge">ENGINEERING AUDIT</span>
         <h1>Bar-Raiser // System Causality Engine</h1>
-        <p class="subtitle">Anti-ATS resume inspection. We audit Google XYZ causality, penalize unbacked buzzwords, and generate interview interrogation matrices.</p>
+        <p class="subtitle">Audit technical causality, quantify metric adherence, and uncover resume-to-JD architectural misalignment.</p>
       </div>
       <div class="stats-badge">Audits Run: <span id="audit-count">--</span></div>
     </header>
@@ -54,36 +54,92 @@
 
       <!-- Output Dashboard -->
       <section class="results-container hidden" id="results-container">
-        <div class="card summary-card">
-          <div class="summary-header">
-            <div>
-              <span class="metric-label">Assessed Level</span>
-              <h2 id="assessed-level">--</h2>
+        
+        <!-- CLIP 2: 4-KPI TOP METRICS STRIP -->
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span>Assessed Seniority</span>
+              <span class="kpi-badge badge-neutral" id="seniority-context">Engineering Depth</span>
             </div>
-            <div class="score-box">
-              <span class="metric-label">Defensibility Index</span>
-              <div class="score-value"><span id="match-score">0</span>%</div>
-            </div>
+            <div class="kpi-value" id="assessed-level">--</div>
+            <div class="kpi-subtext">Evaluates architectural causality and system architecture scope</div>
           </div>
-          <p id="fit-summary" class="summary-text"></p>
-          
-          <div id="buzzword-radar" class="buzzword-box hidden">
-            <span class="alert-tag">UNBACKED BUZZWORDS DETECTED</span>
-            <p class="buzzword-desc">Technologies listed under your Skills with zero architectural proof in experience:</p>
-            <div id="buzzwords-list" class="tag-list"></div>
+
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span>JD Match Fit</span>
+              <span class="kpi-badge badge-blue">Proof-Backed</span>
+            </div>
+            <div class="kpi-value"><span id="match-score">0</span>%</div>
+            <div class="kpi-subtext">Verified technical alignment against target requirements</div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span>XYZ Adherence</span>
+              <span class="kpi-badge badge-green">Google Standard</span>
+            </div>
+            <div class="kpi-value"><span id="xyz-score">0</span>%</div>
+            <div class="kpi-subtext">Ratio of bullet points backed by quantified business metrics</div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span>Unbacked Skills</span>
+              <span class="kpi-badge badge-red">Zero Proof</span>
+            </div>
+            <div class="kpi-value value-warn" id="unbacked-count">0</div>
+            <div class="kpi-subtext">Claimed skills without project implementation proof</div>
           </div>
         </div>
 
+        <!-- UNBACKED BUZZWORD BANNER -->
+        <div id="buzzword-radar" class="buzzword-box hidden">
+          <div class="buzzword-title-row">
+            <span class="alert-icon">⚠️</span>
+            <span class="alert-tag">Unsupported Skills Detected</span>
+          </div>
+          <p class="buzzword-desc">These technologies are listed on your resume but have zero supporting bullets across your projects:</p>
+          <div id="buzzwords-list" class="tag-list"></div>
+        </div>
+
+        <!-- EXECUTIVE TECHNICAL ASSESSMENT -->
+        <div class="card summary-card">
+          <div class="card-header-bar">
+            <div class="header-left">
+              <span class="icon-inline">📄</span>
+              <h3 class="section-heading">Executive Technical Assessment</h3>
+            </div>
+            <span class="bar-raiser-tag">Bar-Raiser Verdict</span>
+          </div>
+          <p id="fit-summary" class="summary-text"></p>
+        </div>
+
+        <!-- SKILL-GAP & ARCHITECTURE MATRIX WITH TABS -->
         <div class="card">
-          <div class="section-title">TECHNICAL PROOF-OF-WORK MATRIX</div>
+          <div class="matrix-header-row">
+            <div>
+              <h3 class="section-heading">Skill-Gap & Architecture Matrix</h3>
+              <p class="section-subheading">Technical skills cross-referenced with verifiable project proof</p>
+            </div>
+            <div class="matrix-tabs" id="matrix-tabs">
+              <button type="button" class="tab-btn active" data-filter="ALL">All <span class="tab-count" id="count-all">0</span></button>
+              <button type="button" class="tab-btn" data-filter="VERIFIED">Verified <span class="tab-count count-verified" id="count-verified">0</span></button>
+              <button type="button" class="tab-btn" data-filter="SURFACE">Surface <span class="tab-count count-surface" id="count-surface">0</span></button>
+              <button type="button" class="tab-btn" data-filter="MISSING">Missing <span class="tab-count count-missing" id="count-missing">0</span></button>
+            </div>
+          </div>
+
           <div class="table-responsive">
             <table class="matrix-table">
               <thead>
                 <tr>
-                  <th>Competency</th>
-                  <th>Category</th>
-                  <th>Verification</th>
-                  <th>Causality Proof</th>
+                  <th>Technology / Skill</th>
+                  <th>Domain Category</th>
+                  <th>Importance</th>
+                  <th>Audit Status</th>
+                  <th>Evidence & Causality Analysis</th>
                 </tr>
               </thead>
               <tbody id="skill-matrix-body"></tbody>
@@ -91,10 +147,33 @@
           </div>
         </div>
 
+        <!-- BULLET-LEVEL CAUSALITY & REFACTORS -->
         <div class="card">
-          <div class="section-title">BULLET-LEVEL CAUSALITY INSPECTION (GOOGLE XYZ)</div>
+          <div class="card-header-bar">
+            <div>
+              <h3 class="section-heading">Bullet-Level Causality & XYZ Refactors</h3>
+              <p class="section-subheading">Git-style refactor diffs upgrading claims to the Google XYZ standard</p>
+            </div>
+            <span class="bar-raiser-tag tag-blue">Google XYZ Metric Model</span>
+          </div>
           <div id="bullet-audits-list" class="bullet-list"></div>
         </div>
+
+        <!-- DEDICATED HIRING MANAGER INTERROGATION PANEL -->
+        <div class="card interrogation-card">
+          <div class="card-header-bar">
+            <div class="header-left">
+              <span class="icon-inline interrogation-icon">⚡</span>
+              <div>
+                <h3 class="section-heading">Hiring Manager Claim Interrogation</h3>
+                <p class="section-subheading">Technical questions probing the depth and architecture behind your claims</p>
+              </div>
+            </div>
+            <span class="drill-tag">Live Drill</span>
+          </div>
+          <div id="interrogation-deck" class="interrogation-list"></div>
+        </div>
+
       </section>
     </main>
   </div>

@@ -3,7 +3,7 @@ from typing import Optional
 from pathlib import Path
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, Response
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 
@@ -28,16 +28,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Simple in-memory / file counter fallback (or connect to Firestore)
+# Simple in-memory / file counter fallback
 STATS_FILE = Path("audit_stats.txt")
 
 def get_audit_count() -> int:
     if not STATS_FILE.exists():
-        return 14  # starting baseline
+        return 18  # Matches recent run baseline
     try:
         return int(STATS_FILE.read_text().strip())
     except Exception:
-        return 14
+        return 18
 
 def increment_audit_count() -> int:
     count = get_audit_count() + 1
@@ -106,8 +106,11 @@ async def analyze_resume(
 # --------------------------------------------------
 # Mount Static Frontend
 # --------------------------------------------------
+# Resolves frontend folder whether launched from root or backend/
 BASE_DIR = Path(__file__).resolve().parent.parent
 frontend_path = BASE_DIR / "frontend"
+if not frontend_path.exists():
+    frontend_path = Path(__file__).resolve().parent / "frontend"
 
 if frontend_path.exists():
     app.mount("/static", StaticFiles(directory=str(frontend_path)), name="static")
@@ -123,3 +126,7 @@ if frontend_path.exists():
     @app.get("/app.js")
     async def serve_js():
         return FileResponse(str(frontend_path / "app.js"), media_type="application/javascript")
+
+    @app.get("/favicon.ico", include_in_schema=False)
+    async def favicon():
+        return Response(status_code=204)
