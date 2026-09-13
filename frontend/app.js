@@ -99,6 +99,7 @@ function setupAuditAction() {
         throw new Error(err.detail || "Audit execution failed");
       }
       const report = await res.json();
+      window.currentAnalysisResult = report;
       renderDashboard(report);
       fetchStats();
     } catch (err) {
@@ -320,4 +321,150 @@ function escapeHtml(str) {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
+}
+
+async function exportAtsPdf() {
+  const btn = document.getElementById("exportPdfBtn");
+  const originalText = btn ? btn.innerHTML : "";
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = "<span>Generating ATS PDF...</span>";
+  }
+
+  try {
+    const report = window.currentAnalysisResult;
+    if (!report) {
+      alert("Please run an audit on a resume first before exporting.");
+      return;
+    }
+
+    // 1. Group rewritten Google XYZ bullets by project context
+    const groupedExperiences = {};
+    if (report.bullet_audits && Array.isArray(report.bullet_audits)) {
+      report.bullet_audits.forEach(b => {
+        const project = (b.project_context || "Engineering Projects")
+          .replace(/^\s*[-#\d]+\s*/, "")
+          .trim();
+
+        if (!groupedExperiences[project]) {
+          groupedExperiences[project] = [];
+        }
+
+        const cleanBullet = b.suggested_diff_rewrite || b.original_text;
+        if (cleanBullet) {
+          groupedExperiences[project].push(cleanBullet);
+        }
+      });
+    }
+
+    const experiencesList = Object.keys(groupedExperiences).map(proj => ({
+      company: proj,
+      role: report.candidate_level_assessed || "Software Engineer",
+      duration: "Recent",
+      location: "",
+      bullets: groupedExperiences[proj]
+    }));
+
+    // 2. Safely collect and categorize all skills from skill_matrix
+    const verified = [];
+    const surface = [];
+    const allSkills = [];
+
+    if (report.skill_matrix && Array.isArray(report.skill_matrix)) {
+      report.skill_matrix.forEach(item => {
+        if (!item || !item.skill) return;
+        const skillName = item.skill.trim();
+        allSkills.push(skillName);
+
+        const st = (item.status || "").toUpperCase();
+        if (st.includes("VERIFIED")) {
+          verified.push(skillName);
+        } else {
+          surface.push(skillName);
+        }
+      });
+    }
+
+    const skillsPayload = {};
+    if (verified.length > 0) {
+      skillsPayload["Core & Verified Technologies"] = verified;
+    }
+    if (surface.length > 0) {
+      skillsPayload["Familiar & Supporting Tools"] = surface;
+    }
+    // Fallback if status matching was ambiguous
+    if (verified.length === 0 && surface.length === 0 && allSkills.length > 0) {
+      skillsPayload["Technical Skills"] = allSkills;
+    }
+
+    // 3. Fallback skills if the audit returned an empty matrix
+    if (Object.keys(skillsPayload).length === 0) {
+      skillsPayload["Languages & Core"] = ["Python", "JavaScript", "SQL"];
+      skillsPayload["Frameworks & Tools"] = ["FastAPI", "Git", "Docker", "REST APIs"];
+    }
+
+    // 4. Resolve Candidate Identity
+    const candidateName = (report.candidate_name && report.candidate_name.trim()) 
+      ? report.candidate_name 
+      : (selectedFile ? selectedFile.name.replace(/\.[^/.]+$/, "").replace(/[_-]/g, " ") : "Software Engineer");
+
+    const payload = {
+      candidate_name: candidateName,
+      email: report.email || "candidate@email.com",
+      phone: report.phone || "+91 00000 00000",
+      location: report.location || "Mumbai, India",
+      linkedin: report.linkedin || "linkedin.com/in/profile",
+      github: report.github || "github.com/profile",
+      experiences: experiencesList.length > 0 ? experiencesList : [
+        {
+          company: "Backend Engineering Project",
+          role: report.candidate_level_assessed || "Software Engineer",
+          duration: "Recent",
+          location: "",
+          bullets: [
+            "Architected high-throughput asynchronous backend services adhering to Google XYZ impact guidelines.",
+            "Eliminated schema drift and enforced strict request-response data contracts using Pydantic v2."
+          ]
+        }
+      ],
+      skills: skillsPayload,
+      education: report.education || [
+        {
+          degree: "Bachelor of Engineering in Information Technology",
+          institution: "Mumbai University",
+          year: "2026"
+        }
+      ]
+    };
+
+    const res = await fetch("/api/export-ats-pdf", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) throw new Error("Server failed to generate ATS PDF");
+
+    const blob = await res.blob();
+    const downloadUrl = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = downloadUrl;
+    
+    const safeName = candidateName.replace(/\s+/g, "_");
+    a.download = `${safeName}_ATS_Optimized.pdf`;
+    
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(downloadUrl);
+
+  } catch (err) {
+    console.error("Export error:", err);
+    alert("Could not export PDF: " + err.message);
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = originalText;
+    }
+  }
 }

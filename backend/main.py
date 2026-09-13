@@ -6,6 +6,10 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, Response
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
+from fastapi.responses import StreamingResponse
+from backend.pdf_generator import generate_ats_pdf
+from pydantic import BaseModel
+from typing import Optional, List, Dict, Any
 
 from backend.schemas import ResumeAuditReport, StatsResponse
 from backend.parser import extract_resume_data
@@ -130,3 +134,37 @@ if frontend_path.exists():
     @app.get("/favicon.ico", include_in_schema=False)
     async def favicon():
         return Response(status_code=204)
+
+
+# --- ATS PDF Export Endpoint ---
+
+class ResumeExportRequest(BaseModel):
+    candidate_name: Optional[str] = "Candidate"
+    email: Optional[str] = None
+    phone: Optional[str] = None
+    location: Optional[str] = None
+    linkedin: Optional[str] = None
+    github: Optional[str] = None
+    experiences: Optional[List[Dict[str, Any]]] = []
+    skills: Optional[Dict[str, Any]] = {}
+    education: Optional[List[Dict[str, Any]]] = []
+
+
+@app.post("/api/export-ats-pdf")
+async def export_ats_pdf(payload: ResumeExportRequest):
+    """
+    Generates and streams an ATS-optimized, machine-readable PDF on the fly.
+    """
+    data = payload.model_dump()
+    pdf_buffer = generate_ats_pdf(data)
+    
+    clean_name = (payload.candidate_name or "Candidate").replace(" ", "_")
+    filename = f"{clean_name}_ATS_Optimized.pdf"
+    
+    return StreamingResponse(
+        pdf_buffer,
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": f'attachment; filename="{filename}"'
+        }
+    )
