@@ -13,13 +13,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
 async function fetchStats() {
   try {
-    const res = await fetch("/api/stats");
+    const res = await fetch("/api/stats", { cache: "no-store" });
+    if (!res.ok) throw new Error("Network response was not ok");
     const data = await res.json();
     const countEl = document.getElementById("audit-count");
-    if (countEl) countEl.innerText = data.total_audits ?? 18;
+    if (countEl) countEl.innerText = data.total_audits ?? 40;
   } catch (e) {
+    console.warn("Could not fetch stats, using default:", e);
     const countEl = document.getElementById("audit-count");
-    if (countEl) countEl.innerText = "18";
+    if (countEl) countEl.innerText = "40";
   }
 }
 

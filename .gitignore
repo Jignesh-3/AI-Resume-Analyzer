@@ -13,6 +13,7 @@ __pycache__/
 # Secrets & Environment Variables
 .env
 *.env
+serviceAccountKey.json
 
 # OS / Editor junk
 .DS_Store

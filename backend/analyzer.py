@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 import time
 from typing import Dict, List, Optional
@@ -7,6 +8,16 @@ from google.genai import types
 from google.genai.errors import APIError
 
 from backend.schemas import ResumeAuditReport
+
+# ---------------------------------------------------------------------------
+# Telemetry & Production Observability Setup
+# ---------------------------------------------------------------------------
+logger = logging.getLogger("bar_raiser.analyzer")
+if not logger.handlers:
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+    )
 
 # ---------------------------------------------------------------------------
 # 1. Target Role Presets (Zero-Friction Audits without pasting a JD)
@@ -52,7 +63,7 @@ ROLE_PRESETS: Dict[str, str] = {
 }
 
 # ---------------------------------------------------------------------------
-# 2. System Instruction: The Bar-Raiser Rubric (Clip 2 Standard)
+# 2. System Instruction: The Bar-Raiser Rubric 
 # ---------------------------------------------------------------------------
 SYSTEM_INSTRUCTION = """
 You are a Principal Software Engineer and Amazon Bar-Raiser / Google Staff Systems Interviewer.
@@ -87,8 +98,8 @@ Your Core Audit Directives:
    - In 'hiring_manager_interrogations', formulate 5 to 7 razor-sharp systems-design questions attacking potential failure modes, thread safety, indexing bottlenecks, and unproven claims.
 """
 
-# Models to attempt in order
-MODELS_TO_TRY = ["gemini-3.6-flash", "gemini-3.6-flash-lite", "gemini-3.5-flash"]
+# Prioritized failover model matrix
+MODELS_TO_TRY = ["gemini-3.8-flash", "gemini-3.5-flash", "gemini-flash-latest"]
 
 # ---------------------------------------------------------------------------
 # 3. Main Audit Execution Function
@@ -102,7 +113,7 @@ def audit_resume_with_llm(
 ) -> ResumeAuditReport:
     """
     Submits extracted resume data and JD/preset criteria to Gemini with strictly
-    enforced Pydantic structured output matching the Clip 2 dashboard schema.
+    enforced Pydantic structured output matching the dashboard schema.
     """
     client_api_key = api_key or os.getenv("GEMINI_API_KEY")
     if not client_api_key:
@@ -134,10 +145,13 @@ def audit_resume_with_llm(
 
     last_error = None
 
-    # Loop through models with backoff retry
+    # Loop through models with zero-delay failover on capacity/quota limits
     for model_name in MODELS_TO_TRY:
         for attempt in range(2):
             try:
+                logger.info("Attempting inference with model: %s (attempt %d)", model_name, attempt + 1)
+                attempt_start = time.time()
+
                 response = client.models.generate_content(
                     model=model_name,
                     contents=prompt,
@@ -147,18 +161,37 @@ def audit_resume_with_llm(
                         response_schema=ResumeAuditReport,
                         temperature=0.1,
                         thinking_config=types.ThinkingConfig(thinking_budget=0),
+                        # Explicitly disable AFC to avoid multi-hop tool-calling delays and warnings
+                        automatic_function_calling=types.AutomaticFunctionCallingConfig(disable=True),
                     ),
                 )
+                
+                elapsed = time.time() - attempt_start
+                logger.info("Inference and schema validation succeeded on %s in %.2fs", model_name, elapsed)
+
                 if response.text:
                     return ResumeAuditReport.model_validate_json(response.text)
+
             except APIError as e:
+                code = getattr(e, "code", None)
+                logger.warning(
+                    "APIError on model %s (attempt %d) [HTTP %s]: %s. Initiating matrix failover.",
+                    model_name,
+                    attempt + 1,
+                    code,
+                    e
+                )
                 last_error = e
-                # Retry on 503 (high demand) or 429 (rate limit)
-                if getattr(e, "code", None) in [503, 429]:
-                    time.sleep(1)
-                    continue
+
+                # Fail over immediately to the next model on capacity (503) or quota (429)
+                if code in [503, 429]:
+                    break
+
+                # 400, 404, or unrecoverable parameters: move to next model immediately
                 break
+
             except Exception as e:
+                logger.error("Unexpected error during inference on model %s: %s", model_name, e)
                 last_error = e
                 break
 
