@@ -88,7 +88,7 @@ Your Core Audit Directives:
 """
 
 # Models to attempt in order
-MODELS_TO_TRY = ["gemini-3.6-flash-lite", "gemini-3.6-flash", "gemini-3.5-flash"]
+MODELS_TO_TRY = ["gemini-3.6-flash", "gemini-3.6-flash-lite", "gemini-3.5-flash"]
 
 # ---------------------------------------------------------------------------
 # 3. Main Audit Execution Function
